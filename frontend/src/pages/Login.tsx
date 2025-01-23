@@ -1,6 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  Modal,
+  Text,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { auth } from "../firebaseConfig";
+import { sendEmailVerification } from "firebase/auth";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 type RootStackParamList = {
   Login: undefined;
@@ -19,23 +35,103 @@ type Props = {
 
 const Login: React.FC<Props> = ({ navigation }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const handleAuth = async () => {
+    try {
+      if (isLogin) {
+        // Login functionality
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        // Show the success modal
+        setShowModal(true);
+
+        // Hide modal after 1 second, then navigate to Home
+        setTimeout(() => {
+          setShowModal(false);
+          setTimeout(() => {
+            navigation.navigate("Home");
+          }, 1000);
+        }, 2000);
+      } else {
+        // Registration functionality
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        // Save the username to Firestore
+        await saveUsername(user.uid, username, email);
+
+        await sendEmailVerification(user);
+        Alert.alert("Success", "Please verify your email before logging in.");
+        navigation.navigate("Login");
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  // Function to save username and initialize the user document in Firestore
+  const saveUsername = async (uid: string, username: string, email: string) => {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, { username, email, watched: [] });
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{isLogin ? "Login" : "Register"}</Text>
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
       {!isLogin && (
-        <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
       )}
-      <Button
-        title={isLogin ? "Login" : "Register"}
-        onPress={() => navigation.navigate("Home")}
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <Button title={isLogin ? "Login" : "Register"} onPress={handleAuth} />
       <Button
         title={isLogin ? "Go to Register" : "Go to Login"}
         onPress={() => setIsLogin(!isLogin)}
       />
+
+      {/* Modal for custom alert */}
+      <Modal
+        transparent={true}
+        visible={showModal}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>Successfully Logged In!</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -47,10 +143,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-  },
   input: {
     width: "100%",
     height: 40,
@@ -59,6 +151,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 8,
     borderRadius: 5,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: 200,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
