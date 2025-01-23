@@ -47,17 +47,11 @@ const Home: React.FC = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  header: {
-    height: 60,
-    backgroundColor: "#f8f8f8",
-    justifyContent: "space-between",
+  container: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 16,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    padding: 16,
   },
 });
 

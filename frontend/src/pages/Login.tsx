@@ -71,16 +71,21 @@ const Login: React.FC<Props> = ({ navigation }) => {
         const user = userCredential.user;
 
         // Save the username to Firestore
-        const usernameDoc = doc(db, "users", user.uid);
-        await setDoc(usernameDoc, { username, email: user.email });
+        await saveUsername(user.uid, username, email);
 
         await sendEmailVerification(user);
-        Alert.alert("Please verify your email before logging in.");
+        Alert.alert("Success", "Please verify your email before logging in.");
         navigation.navigate("Login");
       }
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
+  };
+
+  // Function to save username and initialize the user document in Firestore
+  const saveUsername = async (uid: string, username: string, email: string) => {
+    const userRef = doc(db, "users", uid);
+    await setDoc(userRef, { username, email, watched: [] });
   };
 
   return (
