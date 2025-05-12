@@ -14,7 +14,9 @@ import { db } from "../firebaseConfig";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
-const MAL_CLIENT_ID = process.env.MAL_CLIENT_ID;
+import Constants from "expo-constants";
+const MAL_CLIENT_ID = Constants.expoConfig?.extra?.MAL_CLIENT_ID;
+
 
 const SearchPage: React.FC = () => {
   const [query, setQuery] = useState("");
@@ -40,7 +42,7 @@ const SearchPage: React.FC = () => {
         )}&limit=50&fields=title,main_picture,popularity`,
         {
           headers: {
-            "X-MAL-CLIENT-ID": clientId,
+            "X-MAL-CLIENT-ID": MAL_CLIENT_ID,
           },
         }
       );
