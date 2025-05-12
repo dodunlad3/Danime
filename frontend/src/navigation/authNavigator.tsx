@@ -5,12 +5,16 @@ import Home from "../pages/Home";
 import Search from "../pages/Search"; // Import the new Search page
 import { getAuth, signOut } from "firebase/auth";
 import { Button } from "react-native";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Search: undefined;
 };
+
+
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -31,12 +35,16 @@ const AuthNavigator: React.FC = () => {
       <Stack.Screen
         name="Home"
         component={Home}
-        options={({ navigation }) => ({
+        options={({
+          navigation,
+        }: {
+          navigation: HomeScreenNavigationProp;
+        }) => ({
           headerTitle: "Home",
           headerLeft: () => (
             <Button
               title="Search"
-              onPress={() => navigation.navigate("Search")} // Navigate to Search page
+              onPress={() => navigation.navigate("Search")}
             />
           ),
           headerRight: () => (
