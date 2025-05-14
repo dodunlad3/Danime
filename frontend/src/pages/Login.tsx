@@ -7,6 +7,7 @@ import {
   Alert,
   Modal,
   Text,
+  TouchableOpacity,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { auth } from "../firebaseConfig";
@@ -43,7 +44,6 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const handleAuth = async () => {
     try {
       if (isLogin) {
-        // Login functionality
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
@@ -51,10 +51,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
         );
         const user = userCredential.user;
 
-        // Show the success modal
         setShowModal(true);
-
-        // Hide modal after 1 second, then navigate to Home
         setTimeout(() => {
           setShowModal(false);
           setTimeout(() => {
@@ -62,17 +59,13 @@ const Login: React.FC<Props> = ({ navigation }) => {
           }, 1000);
         }, 2000);
       } else {
-        // Registration functionality
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
         const user = userCredential.user;
-
-        // Save the username to Firestore
         await saveUsername(user.uid, username, email);
-
         await sendEmailVerification(user);
         Alert.alert("Success", "Please verify your email before logging in.");
         navigation.navigate("Login");
@@ -82,7 +75,6 @@ const Login: React.FC<Props> = ({ navigation }) => {
     }
   };
 
-  // Function to save username and initialize the user document in Firestore
   const saveUsername = async (uid: string, username: string, email: string) => {
     const userRef = doc(db, "users", uid);
     await setDoc(userRef, { username, email, watched: [] });
@@ -90,10 +82,12 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>Danime</Text>
       {!isLogin && (
         <TextInput
           style={styles.input}
           placeholder="Username"
+          placeholderTextColor="#888"
           value={username}
           onChangeText={setUsername}
         />
@@ -101,6 +95,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#888"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -109,17 +104,24 @@ const Login: React.FC<Props> = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor="#888"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title={isLogin ? "Login" : "Register"} onPress={handleAuth} />
-      <Button
-        title={isLogin ? "Go to Register" : "Go to Login"}
-        onPress={() => setIsLogin(!isLogin)}
-      />
+      <TouchableOpacity style={styles.button} onPress={handleAuth}>
+        <Text style={styles.buttonText}>{isLogin ? "Login" : "Register"}</Text>
+      </TouchableOpacity>
 
-      {/* Modal for custom alert */}
+      <TouchableOpacity
+        style={[styles.button, styles.buttonAlt]}
+        onPress={() => setIsLogin(!isLogin)}
+      >
+        <Text style={styles.buttonText}>
+          {isLogin ? "Go to Register" : "Go to Login"}
+        </Text>
+      </TouchableOpacity>
+
       <Modal
         transparent={true}
         visible={showModal}
@@ -139,33 +141,59 @@ const Login: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#0D0D0D",
+    padding: 20,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
+  },
+  header: {
+    fontSize: 32,
+    color: "#9B59B6",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 24,
   },
   input: {
-    width: "100%",
-    height: 40,
+    height: 45,
+    borderRadius: 10,
+    borderColor: "#444",
     borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 16,
-    paddingHorizontal: 8,
-    borderRadius: 5,
+    paddingHorizontal: 12,
+    backgroundColor: "#1C1C1C",
+    color: "#fff",
+    marginBottom: 12,
+  },
+  button: {
+    backgroundColor: "#9B59B6",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  buttonAlt: {
+    backgroundColor: "#333",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
   modalBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   modalContainer: {
-    width: 200,
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
+    width: 250,
+    padding: 24,
+    backgroundColor: "#1C1C1C",
+    borderRadius: 12,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#F1C40F",
   },
   modalText: {
+    color: "#F1C40F",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
