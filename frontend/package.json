@@ -16,13 +16,15 @@
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.7.9",
+    "babel-plugin-dotenv-import": "^3.0.1",
     "expo": "^53.0.9",
     "expo-status-bar": "~2.2.3",
     "firebase": "^10.14.1",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-safe-area-context": "^5.4.0"
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-toast-notifications": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

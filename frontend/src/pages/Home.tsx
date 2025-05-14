@@ -38,7 +38,20 @@ const Home: React.FC = ({ navigation }: any) => {
   }, [navigation]);
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#0D0D0D",
+        },
+        headerTintColor: "#F1C40F",
+        tabBarStyle: {
+          backgroundColor: "#1C1C1C",
+          borderTopColor: "#444",
+        },
+        tabBarActiveTintColor: "#9B59B6",
+        tabBarInactiveTintColor: "#ccc",
+      }}
+    >
       <Tab.Screen name="Watched" component={WatchedTab} />
       <Tab.Screen name="Planned" component={PlannedTab} />
       <Tab.Screen name="Recommendations" component={RecommendationsTab} />
@@ -49,6 +62,7 @@ const Home: React.FC = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#0D0D0D",
     justifyContent: "center",
     alignItems: "center",
     padding: 16,

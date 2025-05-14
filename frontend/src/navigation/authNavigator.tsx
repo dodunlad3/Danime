@@ -4,7 +4,7 @@ import Login from "../pages/Login";
 import Home from "../pages/Home";
 import Search from "../pages/Search"; // Import the new Search page
 import { getAuth, signOut } from "firebase/auth";
-import { Button } from "react-native";
+import { View, Button, StyleSheet } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type RootStackParamList = {
@@ -12,7 +12,6 @@ type RootStackParamList = {
   Home: undefined;
   Search: undefined;
 };
-
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -26,7 +25,18 @@ const AuthNavigator: React.FC = () => {
   };
 
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#0D0D0D",
+        },
+        headerTintColor: "#F1C40F",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
       <Stack.Screen
         name="Login"
         component={Login}
@@ -42,19 +52,25 @@ const AuthNavigator: React.FC = () => {
         }) => ({
           headerTitle: "Home",
           headerLeft: () => (
-            <Button
-              title="Search"
-              onPress={() => navigation.navigate("Search")}
-            />
+            <View style={styles.headerButtonContainer}>
+              <Button
+                title="Search"
+                onPress={() => navigation.navigate("Search")}
+                color="#F1C40F"
+              />
+            </View>
           ),
           headerRight: () => (
-            <Button
-              title="Logout"
-              onPress={async () => {
-                await handleLogout();
-                navigation.navigate("Login");
-              }}
-            />
+            <View style={styles.headerButtonContainer}>
+              <Button
+                title="Logout"
+                onPress={async () => {
+                  await handleLogout();
+                  navigation.navigate("Login");
+                }}
+                color="#F1C40F"
+              />
+            </View>
           ),
         })}
       />
@@ -66,5 +82,11 @@ const AuthNavigator: React.FC = () => {
     </Stack.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  headerButtonContainer: {
+    paddingHorizontal: 10,
+  },
+});
 
 export default AuthNavigator;
