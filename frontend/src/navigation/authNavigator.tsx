@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
-import Search from "../pages/Search"; // Import the new Search page
+import Search from "../pages/Search";
+import Watching from "../pages/Watching"
 import { getAuth, signOut } from "firebase/auth";
 import { View, Button, StyleSheet } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -11,6 +12,7 @@ type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Search: undefined;
+  Watching: undefined;
 };
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
@@ -78,6 +80,12 @@ const AuthNavigator: React.FC = () => {
         name="Search"
         component={Search} // Add the Search page
         options={{ headerTitle: "Search Anime" }}
+      />
+
+      <Stack.Screen
+        name="Watching"
+        component={Watching}
+        options={{ headerTitle: "Currently Watching" }}
       />
     </Stack.Navigator>
   );
