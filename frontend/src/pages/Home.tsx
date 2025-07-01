@@ -7,11 +7,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import WatchedTab from "./tabs/watchedTab";
 import PlannedTab from "./tabs/plannedTab";
 import RecommendationsTab from "./tabs/recommendationsTab";
+import watchingTab from "./tabs/watchingTab";
 
 type TabParamList = {
   Watched: undefined;
   Planned: undefined;
   Recommendations: undefined;
+  Watching: undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -54,6 +56,7 @@ const Home: React.FC = ({ navigation }: any) => {
     >
       <Tab.Screen name="Watched" component={WatchedTab} />
       <Tab.Screen name="Planned" component={PlannedTab} />
+      <Tab.Screen name="Watching" component={watchingTab} />
       <Tab.Screen name="Recommendations" component={RecommendationsTab} />
     </Tab.Navigator>
   );

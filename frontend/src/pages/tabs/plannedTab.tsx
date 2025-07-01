@@ -25,12 +25,13 @@ import axios from "axios";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
+const auth = getAuth();
+
 const PlannedTab: React.FC = () => {
   const [plannedList, setPlannedList] = useState<any[]>([]);
   const [animeDetails, setAnimeDetails] = useState<Record<string, any>>({});
   const [selectedAnime, setSelectedAnime] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const auth = getAuth();
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -75,10 +76,7 @@ const PlannedTab: React.FC = () => {
   const removeFromPlanned = async (anime: any) => {
     try {
       const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Error", "You must be logged in to remove from the list.");
-        return;
-      }
+      if (!user) return;
 
       const userDocRef = doc(db, "users", user.uid);
       await updateDoc(userDocRef, {
@@ -96,10 +94,7 @@ const PlannedTab: React.FC = () => {
   const moveToWatched = async (anime: any) => {
     try {
       const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Error", "You must be logged in to move items.");
-        return;
-      }
+      if (!user) return;
 
       const userDocRef = doc(db, "users", user.uid);
       await updateDoc(userDocRef, {
@@ -112,6 +107,25 @@ const PlannedTab: React.FC = () => {
     } catch (error) {
       console.error("Error moving to watched:", error);
       Alert.alert("Error", "Failed to move anime to watched list.");
+    }
+  };
+
+  const moveToWatching = async (anime: any) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        planned: arrayRemove(anime),
+        currentlyWatching: arrayUnion({ ...anime, episode: 1 }),
+      });
+
+      Alert.alert("Success", `${anime.title} moved to your watching list.`);
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error moving to watching:", error);
+      Alert.alert("Error", "Failed to move anime to watching list.");
     }
   };
 
@@ -180,6 +194,14 @@ const PlannedTab: React.FC = () => {
                   style={styles.buttonRed}
                 >
                   <Text style={styles.buttonText}>Remove from Planned</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  style={styles.moveButton}
+                  onPress={() => moveToWatching(selectedAnime)}
+                >
+                  <Text style={styles.buttonText}>Move to Watching</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -311,7 +333,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     alignSelf: "center",
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -402,6 +423,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 0.48,
     alignItems: "center",
+  },
+  moveButton: {
+    backgroundColor: "#2980b9",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    flex: 1,
   },
   buttonText: {
     color: "#fff",

@@ -15,16 +15,18 @@ import { getAuth } from "firebase/auth";
 import { db } from "../../firebaseConfig";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 import axios from "axios";
+import { arrayUnion as firestoreArrayUnion } from "firebase/firestore";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
+
+const auth = getAuth();
 
 const WatchedTab: React.FC = () => {
   const [watchedList, setWatchedList] = useState<any[]>([]);
   const [animeDetails, setAnimeDetails] = useState<Record<string, any>>({});
   const [selectedAnime, setSelectedAnime] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const auth = getAuth();
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -182,11 +184,20 @@ const WatchedTab: React.FC = () => {
                 </Text>
               )}
             </View>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={styles.moveButton}
+                onPress={() => moveToWatching(item)}
+              >
+                <Text style={styles.buttonText}>Rewatch</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -207,6 +218,26 @@ const WatchedTab: React.FC = () => {
     </View>
   );
 };
+
+const moveToWatching = async (anime: any) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", user.uid);
+
+    await updateDoc(userDocRef, {
+      watched: arrayRemove(anime),
+      watching: arrayUnion({ ...anime, episode: 1 }),
+    });
+
+    Alert.alert("Success", `${anime.title} moved to your watching list.`);
+  } catch (error) {
+    console.error("Error moving to watching:", error);
+    Alert.alert("Error", "Failed to move anime to watching list.");
+  }
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -384,6 +415,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  moveButton: {
+    backgroundColor: "#2980B9",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 8,
+  },
 });
 
 export default WatchedTab;
+function arrayUnion(arg0: any): unknown {
+  throw new Error("Function not implemented.");
+}
+
